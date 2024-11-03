@@ -1,8 +1,12 @@
 import React from 'react';
-import { Stack, Slot } from "expo-router";
 import { useFonts } from "expo-font";
+import { createStackNavigator } from '@react-navigation/stack';
+import LoginScreen from './login/index';
+import SignInScreen from './signin/index';
+// import TabLayout from './(tabs)/_layout';
 
 export default function RootLayout() {
+  const Stack = createStackNavigator();
   const [fontsLoaded] = useFonts({
     "iceberg": require("./../assets/fonts/Iceberg-Regular.ttf"),
     "inter-bold": require("./../assets/fonts/Inter-Bold.ttf"),
@@ -17,8 +21,13 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <Stack>
-      <Slot />
-    </Stack>
+    <Stack.Navigator>
+      <Stack.Screen name="login/index" component={LoginScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="signin/index" component={SignInScreen} options={{ headerShown: false }} />
+      {/* <Stack.Screen name="(tabs)" component={TabLayout} options={{ headerShown: false }} /> */}
+    </Stack.Navigator>
   );
 }
+
+
+
