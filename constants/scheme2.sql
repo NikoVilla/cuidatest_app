@@ -1,19 +1,23 @@
+CREATE DATABASE cuidatest2;
+
+USE cuidatest2;
+
 -- Tabla Usuario
 CREATE TABLE Usuario (
-    RUT INTEGER PRIMARY KEY,
-    nombres TEXT,
-    apellidos TEXT,
+    RUT VARCHAR(9) UNIQUE NOT NULL PRIMARY KEY,
+    nombres VARCHAR(255),
+    apellidos VARCHAR(255),
     fecha_nacimiento DATE,
-    genero TEXT,
-    celular INTEGER,
-    direccion TEXT
-    correo TEXT,
+    genero VARCHAR(50),
+    celular VARCHAR(12),
+    direccion TEXT,
+    correo VARCHAR(255)
 );
 
 -- Tabla Lock
 CREATE TABLE Lock (
     id_lock INTEGER PRIMARY KEY AUTOINCREMENT,
-    RUT INTEGER,
+    RUT VARCHAR(9),
     contraseña TEXT,
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT)
 );
@@ -30,11 +34,12 @@ CREATE TABLE Dispositivo (
 CREATE TABLE ContactoEmergencia (
     id_contacto INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre_completo TEXT,
-    celular INTEGER,
+    celular VARCHAR(12),
     direccion TEXT,
     relacion TEXT,
-    correo TEXT,
+    correo VARCHAR(255),
     tipo_alerta TEXT,
+    RUT VARCHAR(9),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT)
 );
 
@@ -42,7 +47,7 @@ CREATE TABLE ContactoEmergencia (
 CREATE TABLE Condicion (
     id_condicion INTEGER PRIMARY KEY AUTOINCREMENT,
     text_cond TEXT,
-    RUT INTEGER,
+    RUT VARCHAR(9),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT)
 );
 
@@ -50,7 +55,7 @@ CREATE TABLE Condicion (
 CREATE TABLE Medicamento (
     id_medicamento INTEGER PRIMARY KEY AUTOINCREMENT,
     text_med TEXT,
-    RUT INTEGER,
+    RUT VARCHAR(9),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT)
 );
 
@@ -58,7 +63,7 @@ CREATE TABLE Medicamento (
 CREATE TABLE Alergia (
     id_alergia INTEGER PRIMARY KEY AUTOINCREMENT,
     text_aler TEXT,
-    RUT INTEGER,
+    RUT VARCHAR(9),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT)
 );
 
@@ -100,7 +105,7 @@ CREATE TABLE Giroscopio (
 
 -- Tabla intermedia SignoVital
 CREATE TABLE SignoVital (
-    RUT INTEGER,
+    RUT VARCHAR(9),
     id_frecuencia INTEGER,
     id_spo2 INTEGER,
     id_temp INTEGER,
@@ -115,7 +120,7 @@ CREATE TABLE SignoVital (
 
 -- Tabla intermedia Usuario-Dispositivo
 CREATE TABLE UDI (
-    RUT INTEGER,
+    RUT VARCHAR(9),
     id_dispositivo INTEGER,
     UNIQUE (RUT, id_dispositivo),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT),
@@ -124,7 +129,7 @@ CREATE TABLE UDI (
 
 -- Tabla intermedia Usuario-Lock 
 CREATE TABLE ULO (
-    RUT INTEGER,
+    RUT VARCHAR(9),
     id_lock INTEGER,
     UNIQUE (RUT, id_lock),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT),
@@ -133,7 +138,7 @@ CREATE TABLE ULO (
 
 -- Tabla intermedia Usuario-ContactoEmergencia
 CREATE TABLE UEM (
-    RUT INTEGER,
+    RUT VARCHAR(9),
     id_contacto INTEGER,
     UNIQUE (RUT, id_contacto),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT),
@@ -142,7 +147,7 @@ CREATE TABLE UEM (
 
 -- Crear tabla intermedia Usuario-Condicion 
 CREATE TABLE UCO (
-    RUT INTEGER,
+    RUT VARCHAR(9),
     id_condicion INTEGER,
     UNIQUE (RUT, id_condicion),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT),
@@ -151,7 +156,7 @@ CREATE TABLE UCO (
 
 -- Crear tabla intermedia Usuario-Medicamento 
 CREATE TABLE UME (
-    RUT INTEGER,
+    RUT VARCHAR(9),
     id_medicamento INTEGER,
     UNIQUE (RUT, id_medicamento),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT),
@@ -160,7 +165,7 @@ CREATE TABLE UME (
 
 -- Crear tabla intermedia Usuario-Alergia
 CREATE TABLE UAL (
-    RUT INTEGER,
+    RUT VARCHAR(9),
     id_alergia INTEGER,
     UNIQUE (RUT, id_alergia),
     FOREIGN KEY (RUT) REFERENCES Usuario (RUT),

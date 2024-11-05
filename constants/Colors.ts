@@ -4,4 +4,7 @@ export default{
   tertiary: '#FFFFFF',  // Color terciario Blanco
   gris: 'E2E2E2', // Color gris
   negro: '#000', //Color negro
+  Stitles: '#D9D9D9', // Fondo titulo screens
+  verde: '#1AB717',
+  graytext: '#2D2D2D'
 }

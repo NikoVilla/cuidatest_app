@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { View, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity, CheckBox } from 'react-native';
 import Colors from './../../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { formatRUT, formatFecha } from './../../constants/formatters';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
-  const [correo, setCorreo] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rut, setRut] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -19,17 +22,22 @@ export default function LoginScreen() {
         <Text style={styles.titleText}>Ingreso</Text>
         <TextInput
           style={styles.input}
-          placeholder="Correo"
-          value={correo}
-          onChangeText={setCorreo}
+          placeholder="RUT"
+          value={rut}
+          onChangeText={(text) => formatRUT(text, setRut)} 
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          value={contraseña}
-          onChangeText={setContraseña}
-          secureTextEntry
-        />
+        <View>
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            value={contraseña}
+            onChangeText={setContraseña}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+            <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="black" />
+          </TouchableOpacity>
+        </View>
         <View style={styles.checkboxContainer}>
           <CheckBox
             value={rememberMe}
@@ -43,7 +51,7 @@ export default function LoginScreen() {
         </TouchableOpacity>
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>¿Ya tienes cuenta? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('signin/index')}>
+          <TouchableOpacity onPress={() => navigation.navigate('signUp/index')}>
             <Text style={styles.signupLink}>Regístrate aquí</Text>
           </TouchableOpacity>
         </View>
@@ -87,7 +95,7 @@ const styles = StyleSheet.create({
   },  
   headerText: {
     color: Colors.tertiary,
-    fontSize: 35,
+    fontSize: 38,
     fontFamily: 'roboto',
   },
   titleText: {
@@ -113,6 +121,11 @@ const styles = StyleSheet.create({
     color: '#000',
     fontFamily: 'nunito-semibold',
   },
+  eyeIcon: {
+    position: 'absolute',
+    right: 10,
+    top: 11,
+  },
   button: {
     backgroundColor: Colors.primary,
     paddingVertical: 10,
@@ -137,5 +150,9 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontFamily: 'nunito-bold',
     fontSize: 14,
+  },
+  errorInput: {
+    borderColor: 'red',
+    borderWidth: 1,
   },
 });
