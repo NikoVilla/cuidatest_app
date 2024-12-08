@@ -9,9 +9,6 @@ const HEADER_HEIGHT = height * 0.15;
 export default function Header() {
   return (
     <View style={[styles.container, { height: HEADER_HEIGHT }]}>
-      <TouchableOpacity style={styles.leftContainer} onPress={() => navigation.navigate('tabs')}>
-        <Ionicons name="chevron-back" size={24} color="white" />
-      </TouchableOpacity>
       <View style={styles.centerContainer}>
         <Image 
           source={require('./../../assets/images/X4.png')} 
@@ -20,7 +17,6 @@ export default function Header() {
         />
         <Text style={styles.cuidatext}>CUIDATEST</Text>
       </View>
-      <View style={styles.rightSpacer} /> {/* Espacio derecho para equilibrar */}
     </View>
   );
 }
@@ -53,6 +49,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   image: {
+    marginTop: 20,
     width: 60,
     height: 50,
   },

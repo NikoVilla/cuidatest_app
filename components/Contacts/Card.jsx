@@ -6,10 +6,9 @@ import Colors from '../../constants/Colors';
 const AlertTypes = [
   { id: '1', title: 'Email', icon: 'checkmark-circle' },
   { id: '2', title: 'SMS', icon: 'checkmark-circle' },
-  { id: '3', title: 'Otro', icon: 'close-circle' },
 ];
 
-export default function Modal() {
+export default function Card() {
   return (
     <View style={styles.modalContainer}>
       <View style={styles.box}>
@@ -18,12 +17,12 @@ export default function Modal() {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>C</Text>
           </View>
-          {/* Contenedor de texto "Casa" */}
+          {/*  Texto "Casa" */}
           <View style={styles.centerContainer}>
             <Text style={styles.centerText}>Casa</Text>
           </View>
           {/* Tipo de Alerta */}
-          <View style={styles.alertContainer}>
+          {/* <View style={styles.alertContainer}>
             <Text style={styles.alertTypeTitle}>Tipo de alerta</Text>
             <FlatList
               data={AlertTypes}
@@ -35,7 +34,7 @@ export default function Modal() {
               )}
               keyExtractor={(item) => item.id}
             />
-          </View>
+          </View> */}
           {/* Botones */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={[styles.button, styles.editButton]}>
@@ -58,7 +57,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   box: {
-    width: '90%',
+    width: '93%',
+    // height: 100,
     backgroundColor: Colors.tertiary,
     borderRadius: 15,
     paddingVertical: 10,

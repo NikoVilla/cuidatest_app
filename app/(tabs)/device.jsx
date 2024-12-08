@@ -11,9 +11,9 @@ export default function Device() {
     <View>
         <Header/>
         <ScreenTitle title="Dispositivo" />
-        <Conextion/>
+        {/* <Conextion/> */}
         <ScreenTitle title="Información del dispositivo" />
-        <Battery/>
+        {/* <Battery/> */}
     </View>
   )
 }

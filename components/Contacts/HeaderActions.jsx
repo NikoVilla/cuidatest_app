@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '../../constants/Colors';
 
-export default function HeaderActions() {
+export default function HeaderActions({ openModal }) {
   return (
     <View style={styles.container}>
       <View style={styles.searchBox}>
@@ -11,10 +11,10 @@ export default function HeaderActions() {
         <TextInput
           style={styles.input}
           placeholder="Búsqueda"
-          placeholderTextColor= {Colors.graytext}
+          placeholderTextColor={Colors.graytext}
         />
       </View>
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity style={styles.addButton} onPress={openModal}>
         <Text style={styles.addButtonText}>Agregar contacto</Text>
         <Ionicons name="person-add-sharp" size={20} />
       </TouchableOpacity>
@@ -73,6 +73,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
     color: Colors.graytext,
     fontFamily: 'inter-medium',
-    fontSize: '10'
+    fontSize: 10
   },
 });

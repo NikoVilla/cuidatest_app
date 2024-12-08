@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity, CheckBox } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
 import Colors from './../../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -38,14 +38,14 @@ export default function LoginScreen() {
             <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="black" />
           </TouchableOpacity>
         </View>
-        <View style={styles.checkboxContainer}>
+        {/* <View style={styles.checkboxContainer}>
           <CheckBox
             value={rememberMe}
             onValueChange={setRememberMe}
             tintColors={{ true: Colors.primary, false: '#000' }}
           />
           <Text style={styles.checkboxText}>Recordar sesión</Text>
-        </View>
+        </View> */}
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('(tabs)')}>
           <Text style={styles.buttonText}>Ingresar</Text>
         </TouchableOpacity>
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   headerText: {
     color: Colors.tertiary,
     fontSize: 38,
-    fontFamily: 'roboto',
+    fontFamily: 'roboto'
   },
   titleText: {
     fontFamily: 'iceberg',

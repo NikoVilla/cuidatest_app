@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, Picker, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
 import Colors from '../../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
 import { formatRUT, formatFecha, formatCelular } from '../../constants/formatters';
@@ -109,7 +109,7 @@ export default function SignUpScreen() {
             </View>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View style={{ flex: 1, marginRight: 4 }}>
+            {/* <View style={{ flex: 1, marginRight: 4 }}>
               <Picker
                 selectedValue={genero}
                 style={[styles.input, isSubmitted && genero === "" && { color: 'red' }]}
@@ -123,7 +123,7 @@ export default function SignUpScreen() {
                 <Picker.Item label="Hombre" value="Hombre" />
                 <Picker.Item label="Mujer" value="Mujer" />
               </Picker>
-            </View>
+            </View> */}
             <View style={{ flex: 1, marginRight: 4 }}>
               <TextInput
                 style={[styles.input, errors.celular && styles.errorInput]}

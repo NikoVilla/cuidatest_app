@@ -3,6 +3,7 @@ import React from 'react'
 import Header from '../../components/Home/Header'
 import ScreenTitle from '../../components/shared/ScreenTitle'
 import Cards from '../../components/Home/Cards'
+// import Panel from '../../components/Home/AvatarPanel/Panel'
 
 export default function Home() {
   return (

@@ -23,7 +23,9 @@
       "permissions": [
         "android.permission.BLUETOOTH",
         "android.permission.BLUETOOTH_ADMIN",
-        "android.permission.BLUETOOTH_CONNECT"
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.SEND_SMS",
+        "android.permission.READ_PHONE_STATE"
       ],
       "package": "com.nikovilla.cuidatest_app"
     },
@@ -44,7 +46,16 @@
           "bluetoothAlwaysPermission": "Allow $(PRODUCT_NAME) to connect to bluetooth devices"
         }
       ],
-      "expo-router"
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "node_modules/@expo-google-fonts/inter/Inter_400Regular.ttf",
+            "node_modules/@expo-google-fonts/roboto-condensed/RobotoCondensed_400Regular.ttf"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

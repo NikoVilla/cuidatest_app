@@ -1,11 +1,15 @@
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import React from 'react';
 import Colors from '../../constants/Colors';
+import { useNavigation } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { height } = Dimensions.get('window');
 const HEADER_HEIGHT = height * 0.18;
 
 export default function Header() {
+  const navigation = useNavigation();
+
   return (
     <View style={[styles.container, { height: HEADER_HEIGHT }]}>
       <View style={styles.leftSection}>
@@ -22,9 +26,9 @@ export default function Header() {
         <Text style={styles.nameText}>Nicolás Villanueva</Text>
       </View>
 
-      <View style={styles.circle}>
-        <Text style={styles.circleText}>NV</Text>
-      </View>
+      <TouchableOpacity onPress={() => navigation.navigate('login/index')} style={styles.circle} > 
+        <Ionicons name="log-out-outline" size={24} color="black" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -50,6 +54,7 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   image: {
+    marginTop: 20,
     width: 60,
     height: 50,
   },
@@ -67,6 +72,7 @@ const styles = StyleSheet.create({
     color: Colors.tertiary,
     fontSize: 14,
     fontFamily: 'inter-medium',
+    marginTop: 10,
   },
   nameText: {
     color: Colors.tertiary,
@@ -78,7 +84,7 @@ const styles = StyleSheet.create({
   circle: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 10,
     backgroundColor: Colors.tertiary,
     alignItems: 'center',
     justifyContent: 'center',

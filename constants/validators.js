@@ -1,4 +1,4 @@
-// Validación para RUT chileno usando módulo 11 y excluyendo patrones repetidos
+// Validación para RUT módulo 11
 export const validateRUT = (rut) => {
   const cleanedRut = rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
 

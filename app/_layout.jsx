@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useFonts } from "expo-font";
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './login/index';
 import SignUpScreen from './signUp/index';
-import { DbContextProvider } from './auth/contextDB';
-import TabLayout from './(tabs)/_layout'; // Asegúrate de que esta ruta sea correcta
+// import { DbContextProvider } from './auth/contextDB';
+import { connectToDatabase, createTables } from './auth/database';
+import TabLayout from './(tabs)/_layout';
 
 const Stack = createStackNavigator();
 
@@ -20,7 +21,22 @@ export default function RootLayout() {
     "roboto": require("./../assets/fonts/RobotoCondensed-Bold.ttf"),
   });
 
-  if (!fontsLoaded) return null;
+  // Callback para cargar y configurar la base de datos
+  // const loadData = useCallback(async () => {
+  //   try {
+  //     const db = await connectToDatabase(); // Conectar a la base de datos
+  //     await createTables(db); // Crear las tablas necesarias
+  //   } catch (error) {
+  //     console.error("Error al cargar la base de datos:", error);
+  //   }
+  // }, []);
+
+  // // useEffect para ejecutar loadData al montar el componente
+  // useEffect(() => {
+  //   loadData();
+  // }, [loadData]);
+
+  // if (!fontsLoaded) return null;
 
   return (
     // <DbContextProvider>

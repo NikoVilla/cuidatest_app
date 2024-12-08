@@ -6,5 +6,6 @@ export default{
   negro: '#000', //Color negro
   Stitles: '#D9D9D9', // Fondo titulo screens
   verde: '#1AB717',
-  graytext: '#2D2D2D'
+  graytext: '#2D2D2D',
+  bgpanel: '#EEEEEE',
 }

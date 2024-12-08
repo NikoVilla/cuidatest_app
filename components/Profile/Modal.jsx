@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Picker} from 'react-native';
-// import { Picker } from '@react-native-picker/picker';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView} from 'react-native';
 import Colors from '../../constants/Colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -94,7 +93,7 @@ export default function Modal() {
         </View>
         
         <View style={styles.row}>
-          <View style={styles.inputContainer}>
+          {/* <View style={styles.inputContainer}>
             <Picker
               selectedValue={genero}
               style={[styles.input, isSubmitted && genero === "" && { color: 'red' }]}
@@ -104,7 +103,7 @@ export default function Modal() {
               <Picker.Item label="Hombre" value="Hombre" />
               <Picker.Item label="Mujer" value="Mujer" />
             </Picker>
-          </View>
+          </View> */}
           <View style={styles.inputContainer}>
             <TextInput
               style={[styles.input, errors.celular && styles.errorInput]}
@@ -248,7 +247,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: Colors.verde,
     borderRadius: 10,
-    marginTop: 30,
+    marginTop: 13,
     paddingVertical: 12,
     width: '60%',
     alignItems: 'center',

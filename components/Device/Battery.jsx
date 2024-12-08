@@ -3,7 +3,7 @@ import React from 'react';
 import Colors from './../../constants/Colors';
 
 export default function Battery() {
-  const batteryLevel = 10; // Nivel de batería (puedes cambiar este valor para probar)
+  const batteryLevel = 10; 
   const batteryStatus = batteryLevel > 75 ? 'Alto' : batteryLevel > 40 ? 'Medio' : 'Bajo';
   const statusColor = batteryStatus === 'Alto' ? 'green' : batteryStatus === 'Medio' ? 'yellow' : 'red';
 
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     marginVertical: 40,
   },
   batteryBox: {
-    width: '50%', // Ancho del 50%
+    width: '50%', 
     height: 90,  
     backgroundColor: Colors.tertiary,
     justifyContent: 'center',
@@ -45,8 +45,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   statusBox: {
-    width: '20%', // Ancho del 20%
-    height: 90,  // Altura fija para igualar
+    width: '20%', 
+    height: 90,  
     backgroundColor: Colors.tertiary,
     justifyContent: 'center',
     alignItems: 'center',
