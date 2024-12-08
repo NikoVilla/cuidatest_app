@@ -65,15 +65,6 @@ export default function CustomModal({ visible, onClose }) {
                 <Ionicons name="chatbox-ellipses-outline" size={20} style={styles.icon} />
                 <Text style={styles.alertText}>SMS</Text>
               </View>
-
-              {/* Other Alert */}
-              {/*<View style={styles.alertOption}>
-                <TouchableOpacity onPress={() => toggleCheckbox('other')} style={styles.checkbox}>
-                  {checkboxState.other && <Ionicons name="checkmark" size={16} color={Colors.primary} />}
-                </TouchableOpacity>
-                <Ionicons name="layers-outline" size={20} style={styles.icon} />
-                <Text style={styles.alertText}>Otro</Text>
-              </View>*/}
             </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={onClose}>

@@ -102,7 +102,6 @@ export default function Cards() {
         <Ionicons name="analytics" size={20} color={Colors.primary} />
         <TouchableOpacity>
           <Text style={styles.historyButton}>Ver historial</Text>
-          <Text style={styles.historyButton}>Bateria: 99%</Text>
         </TouchableOpacity>
       </View>
 
@@ -150,7 +149,7 @@ const styles = StyleSheet.create({
     marginLeft: 3,
   },
   middleSpacer: {
-    flex: 0.44,
+    flex: 0.42,
   },
   container: {
     flex: 1,
