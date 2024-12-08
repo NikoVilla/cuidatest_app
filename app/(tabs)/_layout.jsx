@@ -68,7 +68,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons name="people-circle" size={24} color={color} />,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="device"
         component={DeviceScreen}
         options={{
@@ -76,7 +76,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color }) => <Ionicons name="bluetooth" size={24} color={color} />,
         }}
-      />
+      /> */}
       <Tab.Screen
         name="profile"
         component={ProfileScreen}

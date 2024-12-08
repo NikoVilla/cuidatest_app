@@ -22,7 +22,7 @@ export default function Card() {
             <Text style={styles.centerText}>Casa</Text>
           </View>
           {/* Tipo de Alerta */}
-          {/* <View style={styles.alertContainer}>
+          <View style={styles.alertContainer}>
             <Text style={styles.alertTypeTitle}>Tipo de alerta</Text>
             <FlatList
               data={AlertTypes}
@@ -34,7 +34,7 @@ export default function Card() {
               )}
               keyExtractor={(item) => item.id}
             />
-          </View> */}
+          </View>
           {/* Botones */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={[styles.button, styles.editButton]}>
@@ -52,13 +52,11 @@ export default function Card() {
 
 const styles = StyleSheet.create({
   modalContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   box: {
     width: '93%',
-    // height: 100,
     backgroundColor: Colors.tertiary,
     borderRadius: 15,
     paddingVertical: 10,
@@ -90,6 +88,7 @@ const styles = StyleSheet.create({
   centerContainer: {
     flex: 1,
     alignItems: 'center',
+    marginRight: 7,
   },
   centerText: {
     fontSize: 17,
@@ -107,6 +106,7 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 2,
   },
   listText: {
     marginLeft: 5,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
-    marginVertical: 6
+    marginVertical: 5
   },
   editButton: {
     backgroundColor: Colors.primary,

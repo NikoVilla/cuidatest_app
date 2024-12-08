@@ -10,7 +10,7 @@ export default function Home() {
     <View>
         <Header/>
         <ScreenTitle title="Signos Vitales" />
-        <Cards/>
+        {/* <Cards/> */}
     </View>
   )
 }
