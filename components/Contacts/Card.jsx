@@ -5,7 +5,7 @@ import Colors from '../../constants/Colors';
 
 const AlertTypes = [
   { id: '1', title: 'Email', icon: 'checkmark-circle' },
-  { id: '2', title: 'SMS', icon: 'checkmark-circle' },
+  { id: '2', title: 'SMS', icon: 'close-circle' },
 ];
 
 export default function Card() {
@@ -22,7 +22,7 @@ export default function Card() {
             <Text style={styles.centerText}>Casa</Text>
           </View>
           {/* Tipo de Alerta */}
-          <View style={styles.alertContainer}>
+          {/* <View style={styles.alertContainer}>
             <Text style={styles.alertTypeTitle}>Tipo de alerta</Text>
             <FlatList
               data={AlertTypes}
@@ -34,7 +34,7 @@ export default function Card() {
               )}
               keyExtractor={(item) => item.id}
             />
-          </View>
+          </View> */}
           {/* Botones */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={[styles.button, styles.editButton]}>

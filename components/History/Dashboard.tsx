@@ -2,13 +2,90 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Colors from "../../constants/Colors";
-import { BarChart, LineChart, PieChart, PopulationPyramid } from "react-native-gifted-charts";
+import { BarChart, LineChart } from "react-native-gifted-charts";
 
+// Datos simulados para las tres mediciones
+const getData = (filter, measurementType) => {
+  let data = [];
+  const currentTime = new Date();
+
+  if (measurementType === 'frecuencia cardiaca') {
+    if (filter === 'Hora') {
+      for (let i = 0; i < 6; i++) {
+        data.push({
+          value: 60 + Math.random() * 40, // Frecuencia cardiaca aleatoria entre 60 y 100
+          label: `${i * 10} min`,
+        });
+      }
+    } else if (filter === 'Día') {
+      for (let i = 0; i < 24; i++) {
+        data.push({
+          value: 60 + Math.random() * 40,
+          label: `${i}:00`,
+        });
+      }
+    } else if (filter === 'Semana') {
+      for (let i = 0; i < 7; i++) {
+        data.push({
+          value: 60 + Math.random() * 40,
+          label: `Día ${i + 1}`,
+        });
+      }
+    }
+  } else if (measurementType === 'temperatura') {
+    if (filter === 'Hora') {
+      for (let i = 0; i < 6; i++) {
+        data.push({
+          value: 20 + Math.random() * 5, // Temperatura aleatoria entre 20 y 25 °C
+          label: `${i * 10} min`,
+        });
+      }
+    } else if (filter === 'Día') {
+      for (let i = 0; i < 24; i++) {
+        data.push({
+          value: 20 + Math.random() * 5,
+          label: `${i}:00`,
+        });
+      }
+    } else if (filter === 'Semana') {
+      for (let i = 0; i < 7; i++) {
+        data.push({
+          value: 20 + Math.random() * 5,
+          label: `Día ${i + 1}`,
+        });
+      }
+    }
+  } else if (measurementType === 'velocidad angular') {
+    if (filter === 'Hora') {
+      for (let i = 0; i < 6; i++) {
+        data.push({
+          value: Math.random() * 100, // Velocidad angular aleatoria entre 0 y 100 °/s
+          label: `${i * 10} min`,
+        });
+      }
+    } else if (filter === 'Día') {
+      for (let i = 0; i < 24; i++) {
+        data.push({
+          value: Math.random() * 100,
+          label: `${i}:00`,
+        });
+      }
+    } else if (filter === 'Semana') {
+      for (let i = 0; i < 7; i++) {
+        data.push({
+          value: Math.random() * 100,
+          label: `Día ${i + 1}`,
+        });
+      }
+    }
+  }
+
+  return data;
+};
 
 export default function Dashboard() {
   const [selectedOption, setSelectedOption] = useState('Semana');
   const [selectedGraph, setSelectedGraph] = useState('frecuencia cardiaca');
-
 
   // Botones disponibles y sus respectivos títulos
   const graphOptions = [
@@ -22,6 +99,8 @@ export default function Dashboard() {
     { label: 'Día', value: 'Día' },
     { label: 'Semana', value: 'Semana' },
   ];
+
+  const data = getData(selectedOption, selectedGraph);
 
   return (
     <View style={styles.container}>
@@ -79,14 +158,191 @@ export default function Dashboard() {
         </View>  
       </View>
 
-      {/* Gráfico aqui*/}
+      {/* Gráfico */}
+      <View style={styles.chartContainer}>
+        {selectedGraph === 'frecuencia cardiaca' && (
+          <LineChart
+            areaChart
+            curved
+            data={data}
+            width={320}
+            height={220}
+            dataPointsColor={'red'}
+            color={'blue'}
+            thickness={2}
+            startFillColor="rgba(45,64,230,0.3)"
+            endFillColor="rgba(45,64,230,0.01)"
+            startOpacity={0.9}
+            endOpacity={0.2}
+            rulesColor="gray"
+            showVerticalLines
+            pointerConfig={{
+              pointerStripHeight: 160,
+              pointerStripColor: 'lightgray',
+              pointerStripWidth: 2,
+              pointerColor: 'lightgray',
+              radius: 6,
+              pointerLabelWidth: 100,
+              pointerLabelHeight: 90,
+              activatePointersOnLongPress: true,
+              autoAdjustPointerLabelPosition: false,
+              pointerLabelComponent: items => {
+                return (
+                  <View
+                    style={{
+                      height: 90,
+                      width: 100,
+                      justifyContent: 'center',
+                      marginTop: -30,
+                      marginLeft: -40,  
+                    }}>
+                    <Text style={{color: 'white', fontSize: 14, marginBottom:6,textAlign:'center'}}>
+                      {items[0].date}
+                    </Text>
+                    <View style={{paddingHorizontal:14,paddingVertical:6, borderRadius:16, backgroundColor:'white'}}>
+                      <Text style={{fontWeight: 'bold',textAlign:'center'}}>
+                        {items[0].value}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              },
+            }}
+            chartConfig={{
+              backgroundColor: Colors.primary,
+              backgroundGradientFrom: Colors.primary,
+              backgroundGradientTo: Colors.secondary,
+              propsForDots: { r: "6", strokeWidth: "2", stroke: Colors.primary },
+            }}
+            yAxisLabel="bpm"
+            xAxisLabel="Tiempo"
+          />
+        )}
 
+        {selectedGraph === 'temperatura' && (
+          <LineChart
+          areaChart
+          curved
+          data={data}
+          width={320}
+          height={220}
+          dataPointsColor={'red'}
+          color={'blue'}
+          thickness={2}
+          startFillColor="rgba(45,64,230,0.3)"
+          endFillColor="rgba(45,64,230,0.01)"
+          startOpacity={0.9}
+          endOpacity={0.2}
+          rulesColor="gray"
+          showVerticalLines
+          pointerConfig={{
+            pointerStripHeight: 160,
+            pointerStripColor: 'lightgray',
+            pointerStripWidth: 2,
+            pointerColor: 'lightgray',
+            radius: 6,
+            pointerLabelWidth: 100,
+            pointerLabelHeight: 90,
+            activatePointersOnLongPress: true,
+            autoAdjustPointerLabelPosition: false,
+            pointerLabelComponent: items => {
+              return (
+                <View
+                  style={{
+                    height: 90,
+                    width: 100,
+                    justifyContent: 'center',
+                    marginTop: -30,
+                    marginLeft: -40,  
+                  }}>
+                  <Text style={{color: 'white', fontSize: 14, marginBottom:6,textAlign:'center'}}>
+                    {items[0].date}
+                  </Text>
+                  <View style={{paddingHorizontal:14,paddingVertical:6, borderRadius:16, backgroundColor:'white'}}>
+                    <Text style={{fontWeight: 'bold',textAlign:'center'}}>
+                      {items[0].value}
+                    </Text>
+                  </View>
+                </View>
+              );
+            },
+          }}
+            chartConfig={{
+              backgroundColor: Colors.primary,
+              backgroundGradientFrom: Colors.primary,
+              backgroundGradientTo: Colors.secondary,
+              propsForDots: { r: "6", strokeWidth: "2", stroke: Colors.primary },
+            }}
+            yAxisLabel="°C"
+            xAxisLabel="Tiempo"
+          />
+        )}
+
+        {selectedGraph === 'velocidad angular' && (
+          <LineChart
+          areaChart
+          curved
+          data={data}
+          width={320}
+          height={220}
+          dataPointsColor={'red'}
+          color={'blue'}
+          thickness={2}
+          startFillColor="rgba(45,64,230,0.3)"
+          endFillColor="rgba(45,64,230,0.01)"
+          startOpacity={0.9}
+          endOpacity={0.2}
+          rulesColor="gray"
+          showVerticalLines
+          pointerConfig={{
+            pointerStripHeight: 160,
+            pointerStripColor: 'lightgray',
+            pointerStripWidth: 2,
+            pointerColor: 'lightgray',
+            radius: 6,
+            pointerLabelWidth: 100,
+            pointerLabelHeight: 90,
+            activatePointersOnLongPress: true,
+            autoAdjustPointerLabelPosition: false,
+            pointerLabelComponent: items => {
+              return (
+                <View
+                  style={{
+                    height: 90,
+                    width: 100,
+                    justifyContent: 'center',
+                    marginTop: -30,
+                    marginLeft: -40,  
+                  }}>
+                  <Text style={{color: 'white', fontSize: 14, marginBottom:6,textAlign:'center'}}>
+                    {items[0].date}
+                  </Text>
+                  <View style={{paddingHorizontal:14,paddingVertical:6, borderRadius:16, backgroundColor:'white'}}>
+                    <Text style={{fontWeight: 'bold',textAlign:'center'}}>
+                      {items[0].value}
+                    </Text>
+                  </View>
+                </View>
+              );
+            },
+          }}
+            chartConfig={{
+              backgroundColor: Colors.primary,
+              backgroundGradientFrom: Colors.primary,
+              backgroundGradientTo: Colors.secondary,
+              propsForDots: { r: "6", strokeWidth: "2", stroke: Colors.primary },
+            }}
+            yAxisLabel="°/s"
+            xAxisLabel="Tiempo"
+          />
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: Colors.secondary },
+  container: { backgroundColor: Colors.secondary, padding: 10 },
   navBar: {
     flexDirection: 'row',
     backgroundColor: '#3D5AFE',
@@ -105,6 +361,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     marginVertical: 12,
   },
-  title: { fontSize: 16, fontFamily: 'inter-bold'},
-  title2: { fontSize: 12, fontFamily: 'inter-regular', marginRight: 6},
+  title: { fontSize: 16, fontFamily: 'inter-bold' },
+  title2: { fontSize: 12, fontFamily: 'inter-regular', marginRight: 6 },
+  chartContainer: { alignItems: 'center', marginTop: 20 },
 });
