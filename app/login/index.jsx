@@ -1,16 +1,28 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, View, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
 import Colors from './../../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { formatRUT, formatFecha } from './../../constants/formatters';
+import appFirebase from './../auth/credentials'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+const auth = getAuth(appFirebase)
 
-export default function LoginScreen() {
+export default function LoginScreen(props) {
   const navigation = useNavigation();
   const [showPassword, setShowPassword] = useState(false);
-  const [rut, setRut] = useState('');
-  const [contraseña, setContraseña] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [correo, setCorreo] = useState();
+  const [contrasena, setContrasena] = useState();
+
+  const login = async()=>{
+    try {
+      await signInWithEmailAndPassword(auth, correo, contrasena)
+      Alert.alert('Ingreso exitoso','Bienvenido')
+      props.navigation.navigate('(tabs)')
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Credenciales incorrectas','El usuario o contraseña es incorrecto...')
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -22,31 +34,23 @@ export default function LoginScreen() {
         <Text style={styles.titleText}>Ingreso</Text>
         <TextInput
           style={styles.input}
-          placeholder="RUT"
-          value={rut}
-          onChangeText={(text) => formatRUT(text, setRut)} 
+          placeholder="Correo"
+          value={correo}
+          onChangeText={(text) => setCorreo(text)}
         />
         <View>
           <TextInput
             style={styles.input}
             placeholder="Contraseña"
-            value={contraseña}
-            onChangeText={setContraseña}
+            value={contrasena}
+            onChangeText={(text) => setContrasena(text)}
             secureTextEntry={!showPassword}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
             <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="black" />
           </TouchableOpacity>
         </View>
-        {/* <View style={styles.checkboxContainer}>
-          <CheckBox
-            value={rememberMe}
-            onValueChange={setRememberMe}
-            tintColors={{ true: Colors.primary, false: '#000' }}
-          />
-          <Text style={styles.checkboxText}>Recordar sesión</Text>
-        </View> */}
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('(tabs)')}>
+        <TouchableOpacity style={styles.button} onPress={login}>
           <Text style={styles.buttonText}>Ingresar</Text>
         </TouchableOpacity>
         <View style={styles.signupContainer}>
@@ -110,16 +114,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     borderRadius: 10,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: Colors.primary,
-  },
-  checkboxText: {
-    marginLeft: 8,
-    color: '#000',
-    fontFamily: 'nunito-semibold',
   },
   eyeIcon: {
     position: 'absolute',

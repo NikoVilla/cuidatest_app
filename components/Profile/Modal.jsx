@@ -1,7 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView} from 'react-native';
 import Colors from '../../constants/Colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { getAuth, onAuthStateChanged, updatePassword } from 'firebase/auth';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import appFirebase from './../../app/auth/credentials';
+import { validateRUT, validatePhone } from '../../constants/validators';
+import { formatRUT, formatFecha, formatCelular } from '../../constants/formatters';
+
+const db = getFirestore(appFirebase);
+const auth = getAuth(appFirebase);
+
+const AvatarInitials = ({ nombres, apellidos }) => {
+  const getInitials = (nombres, apellidos) => {
+    const firstNameInitial = nombres ? nombres.charAt(0).toUpperCase() : '';
+    const lastNameInitial = apellidos ? apellidos.charAt(0).toUpperCase() : '';
+    return `${firstNameInitial}${lastNameInitial}`;
+  };
+
+  return (
+    <View >
+      <Text style={styles.headerText}>{getInitials(nombres, apellidos)}</Text>
+    </View>
+  );
+};
 
 export default function Modal() {
   const [showPassword, setShowPassword] = useState(false);
@@ -9,19 +31,71 @@ export default function Modal() {
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
-  const [genero, setGenero] = useState('');
   const [celular, setCelular] = useState('');
   const [direccion, setDireccion] = useState('');
   const [correo, setCorreo] = useState('');
-  const [contraseña, setContraseña] = useState('');
+  const [contrasena, setContrasena] = useState('');
 
-  const [conditions, setConditions] = useState('');
-  const [allergies, setAllergies] = useState('');
-  const [medications, setMedications] = useState('');
+  const [condicion, setCondicion] = useState('');
+  const [alergias, setAlergias] = useState('');
+  const [medicamentos, setMedicamentos] = useState('');
 
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [userData, setUserData] = useState(null);
+  // const [loading, setLoading] = useState(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!rut || !validateRUT(rut)) {newErrors.rut = "RUT inválido";}
+    if (!nombres) newErrors.nombres = true;
+    if (!apellidos) newErrors.apellidos = true;
+    if (!fechaNacimiento) newErrors.fechaNacimiento = true;
+    if (!celular || !validatePhone(celular)) {newErrors.celular = "N° de celular inválido";}
+    if (!direccion) newErrors.direccion = true;
+    if (!correo || !/\S+@\S+\.\S+/.test(correo)) newErrors.correo = true;
+    if (contrasena && contrasena.length < 6) {newErrors.contrasena = "La contraseña debe tener al menos 6 caracteres.";}    
+
+    setErrors(newErrors);
+    
+    return Object.keys(newErrors).length === 0;
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDocRef = doc(db, 'Usuarios', user.email);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            const data = userDocSnap.data();
+            setUserData({ ...data, correo: user.email });
+            setRut(userDocSnap.data().rut || '');
+            setNombres(userDocSnap.data().nombres || '');
+            setApellidos(userDocSnap.data().apellidos || '');
+            setFechaNacimiento(userDocSnap.data().fechaNacimiento || '');
+            setCelular(userDocSnap.data().celular || '');
+            setDireccion(userDocSnap.data().direccion || '');
+            setCorreo(userDocSnap.data().correo || '');
+            setCondicion(userDocSnap.data().condicion || '');
+            setAlergias(userDocSnap.data().alergias || '');
+            setMedicamentos(userDocSnap.data().medicamentos || '');
+          } else {
+            console.log('No existe información del usuario.');
+          }
+        } catch (error) {
+          console.error('Error al obtener datos del usuario:', error);
+        }
+      } else {
+        console.log('No hay ningún usuario logueado.');
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleFocus = (field) => {
     if (errors[field]) {
@@ -29,24 +103,59 @@ export default function Modal() {
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleRegister = () => {
+  const handleRegister = async () => {
     setIsSubmitted(true);
+    // setLoading(true);
+    console.log('Validando formulario...');
+    
     if (validateForm()) {
+      console.log('Formulario válido. Actualizando datos...');
       setFormError('');
+
+      if (!userData || !userData.correo) {
+        console.error("No se pudo obtener el UID del usuario.");
+        return;
+      }
+
+      try {
+        const userDocRef = doc(db, 'Usuarios', userData.correo);
+        const updatedData = {
+          rut,
+          nombres,
+          apellidos,
+          fechaNacimiento,
+          celular,
+          direccion,
+          condicion,
+          alergias,
+          medicamentos,
+        };
+  
+        await updateDoc(userDocRef, updatedData);
+        console.log('Datos actualizados en Firestore.');
+  
+        // Actualizar la contraseña si es válida
+        if (contrasena && contrasena.length >= 6) {
+          const user = auth.currentUser;
+          if (user) {
+            await updatePassword(user, contrasena);
+            console.log('Contraseña actualizada correctamente.');
+          }
+        }
+      } catch (error) {
+        console.error('Error al actualizar datos:', error);
+      }
+    } else {
+      console.log('Errores en el formulario:', errors);
     }
   };
+  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.box}>
-          <Text style={styles.headerText}>NV</Text>
+          <AvatarInitials nombres={nombres} apellidos={apellidos} />
         </View>
         <Text style={styles.titleText}>Datos personales</Text>
         
@@ -93,17 +202,6 @@ export default function Modal() {
         </View>
         
         <View style={styles.row}>
-          {/* <View style={styles.inputContainer}>
-            <Picker
-              selectedValue={genero}
-              style={[styles.input, isSubmitted && genero === "" && { color: 'red' }]}
-              onValueChange={(itemValue) => setGenero(itemValue)}
-            >
-              <Picker.Item label="Género" value="" />
-              <Picker.Item label="Hombre" value="Hombre" />
-              <Picker.Item label="Mujer" value="Mujer" />
-            </Picker>
-          </View> */}
           <View style={styles.inputContainer}>
             <TextInput
               style={[styles.input, errors.celular && styles.errorInput]}
@@ -128,14 +226,15 @@ export default function Modal() {
           placeholder={errors.correo ? "Campo obligatorio" : "Correo"}
           value={correo}
           onChangeText={setCorreo}
+          editable={false}
           onFocus={() => handleFocus('correo')}
         />
         <View>
           <TextInput
-            style={[styles.input, errors.contraseña && styles.errorInput]}
-            placeholder={errors.contraseña ? "Campo obligatorio" : "Contraseña"}
-            value={contraseña}
-            onChangeText={setContraseña}
+            style={styles.input}
+            placeholder="Nueva Contraseña (opcional)"
+            value={contrasena}
+            onChangeText={setContrasena}
             secureTextEntry={!showPassword}
             onFocus={() => handleFocus('contraseña')}
           />
@@ -152,9 +251,9 @@ export default function Modal() {
             style={styles.medicalInput}
             placeholder="Condiciones preexistentes"
             multiline
-            value={conditions}
-            onChangeText={setConditions}
-            onSubmitEditing={() => setConditions(conditions + '\n')} 
+            value={condicion}
+            onChangeText={setCondicion}
+            onSubmitEditing={() => setCondicion(condicion + '\n')} 
           />
         </View>
         <View style={styles.inputContainer}>
@@ -162,9 +261,9 @@ export default function Modal() {
             style={styles.medicalInput}
             placeholder="Alergias"
             multiline
-            value={allergies}
-            onChangeText={setAllergies} 
-            onSubmitEditing={() => setAllergies(allergies + '\n')}
+            value={alergias}
+            onChangeText={setAlergias} 
+            onSubmitEditing={() => setAlergias(alergias + '\n')}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -172,16 +271,18 @@ export default function Modal() {
             style={styles.medicalInput}
             placeholder="Medicamentos actuales"
             multiline 
-            value={medications}
-            onChangeText={setMedications} 
-            onSubmitEditing={() => setMedications(medications + '\n')}
+            value={medicamentos}
+            onChangeText={setMedicamentos} 
+            onSubmitEditing={() => setMedicamentos(medicamentos + '\n')}
           />
         </View>      
         <TouchableOpacity 
             style={styles.button}
             onPress={handleRegister}
+            // disabled={loading}
         >
             <Text style={styles.buttonText}>Confirmar datos</Text>
+            {/* <Text style={styles.buttonText}>{loading ? 'Actualizando...' : 'Confirmar datos'}</Text> */}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -195,11 +296,12 @@ const styles = StyleSheet.create({
   box: {
     backgroundColor: Colors.primary,
     paddingVertical: 5,
-    paddingHorizontal: 20,
     alignSelf: 'center',
     borderRadius: 10,
     marginBottom: 15,
-  },
+    minWidth: 150,
+    minHeight: 50, 
+  },  
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',

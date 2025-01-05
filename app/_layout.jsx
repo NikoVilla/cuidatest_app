@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './login/index';
 import SignUpScreen from './signUp/index';
 // import { DbContextProvider } from './auth/contextDB';
-import { connectToDatabase, createTables } from './auth/database';
+// import { connectToDatabase, createTables } from './auth/database';
 import TabLayout from './(tabs)/_layout';
 
 const Stack = createStackNavigator();

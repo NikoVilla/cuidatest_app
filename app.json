@@ -25,7 +25,9 @@
         "android.permission.BLUETOOTH_ADMIN",
         "android.permission.BLUETOOTH_CONNECT",
         "android.permission.SEND_SMS",
-        "android.permission.READ_PHONE_STATE"
+        "android.permission.READ_PHONE_STATE",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "package": "com.nikovilla.cuidatest_app"
     },
@@ -62,7 +64,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "457b9132-0ea9-4e12-9db3-29de08aeea13"
+        "projectId": "1a77bd3c-158d-4295-bc98-5c07faf77af0"
       }
     }
   }

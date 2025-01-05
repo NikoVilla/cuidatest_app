@@ -2,24 +2,79 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView, StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '../../constants/Colors';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import appFirebase from './../../app/auth/credentials';
 
-export default function CustomModal({ visible, onClose }) {
+const db = getFirestore(appFirebase);
+
+export default function CustomModal({ visible, onClose, userData }) {
   const [errors, setErrors] = useState({});
-  const [checkboxState, setCheckboxState] = useState({
-    email: false,
-    sms: false,
-    other: false,
-  });
-
-  const toggleCheckbox = (type) => {
-    setCheckboxState((prev) => ({ ...prev, [type]: !prev[type] }));
-  };
+  const [nombreCompleto, setNombreCompleto] = useState('');
+  const [contactoCelular, setContactoCelular] = useState('');
+  const [contactoDireccion, setContactoDireccion] = useState('');
+  const [contactoCorreo, setContactoCorreo] = useState('');
 
   const handleFocus = (field) => {
     if (errors[field]) {
       setErrors(prevErrors => ({ ...prevErrors, [field]: undefined }));
     }
   };
+
+  const validateFields = () => {
+    const newErrors = {};
+    if (!nombreCompleto) newErrors.nombreCompleto = 'El nombre completo es obligatorio';
+    if (!contactoCelular) newErrors.contactoCelular = 'El celular es obligatorio';
+    if (!contactoDireccion) newErrors.contactoDireccion = 'La dirección es obligatoria';
+    if (!contactoCorreo || !/\S+@\S+\.\S+/.test(contactoCorreo)) newErrors.contactoCorreo = 'Correo electrónico inválido';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validateFields()) return;
+  
+    try {
+      const newContact = {
+        nombreCompleto,
+        contactoCelular: contactoCelular,
+        contactoDireccion: contactoDireccion,
+        contactoCorreo: contactoCorreo,
+      };
+  
+      if (!userData || !userData.correo) {
+        console.error("No se recibió userData o correo.");
+        return;
+      }
+
+      const contactDocRef = doc(db, 'Usuarios', userData.correo, 'Contacto', contactoCorreo);
+
+      await setDoc(contactDocRef, newContact);
+  
+      console.log("Contacto guardado correctamente con el correo como ID.");
+      onClose();
+    } catch (error) {
+      console.error("Error al guardar el contacto:", error);
+    }
+  };
+   
+
+//   console.log("Contacto guardado correctamente con el correo como ID.");
+//   setSuccessMessage("Contacto guardado correctamente.");
+//   setTimeout(() => setSuccessMessage(''), 3000);  // Limpiar el mensaje de éxito después de 3 segundos
+//   resetFields();
+//   onClose();
+// } catch (error) {
+//   console.error("Error al guardar el contacto:", error);
+// }
+// };
+
+// const resetFields = () => {
+// setNombreCompleto('');
+// setContactoCelular('');
+// setContactoDireccion('');
+// setContactoCorreo('');
+// };
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
@@ -31,43 +86,50 @@ export default function CustomModal({ visible, onClose }) {
           <Text style={styles.modalTitle}>Agregar contacto</Text>
           <ScrollView contentContainerStyle={styles.formContainer} keyboardShouldPersistTaps="handled">
             <View style={styles.inputContainer}>
-              <TextInput style={styles.input} placeholder="Nombre completo" />
+              <TextInput 
+                style={[styles.input, errors.nombreCompleto && styles.inputError]} 
+                placeholder="Nombre completo" 
+                value={nombreCompleto}
+                onChangeText={setNombreCompleto}
+                onFocus={() => handleFocus('nombreCompleto')}
+              />
+              {errors.nombreCompleto && <Text style={styles.errorText}>{errors.nombreCompleto}</Text>}
             </View>
             <View style={styles.inputContainer}>
-              <TextInput style={styles.input} placeholder="Celular" keyboardType="phone-pad" />
+              <TextInput 
+                style={[styles.input, errors.contactoCelular && styles.inputError]} 
+                placeholder="Celular" 
+                keyboardType="phone-pad" 
+                value={contactoCelular}
+                onChangeText={setContactoCelular}
+                onFocus={() => handleFocus('contactoCelular')}
+              />
+              {errors.contactoCelular && <Text style={styles.errorText}>{errors.contactoCelular}</Text>}
             </View>
             <View style={styles.inputContainer}>
-              <TextInput style={styles.input} placeholder="Dirección" />
+              <TextInput 
+                style={[styles.input, errors.contactoDireccion && styles.inputError]} 
+                placeholder="Dirección" 
+                value={contactoDireccion}
+                onChangeText={setContactoDireccion}
+                onFocus={() => handleFocus('contactoDireccion')}
+              />
+              {errors.contactoDireccion && <Text style={styles.errorText}>{errors.contactoDireccion}</Text>}
             </View>
             <View style={styles.inputContainer}>
-              <TextInput style={styles.input} placeholder="Relación" />
-            </View>
-            <View style={styles.inputContainer}>
-              <TextInput style={styles.input} placeholder="Correo" keyboardType="email-address" />
+              <TextInput 
+                style={[styles.input, errors.contactoCorreo && styles.inputError]} 
+                placeholder="Correo" 
+                keyboardType="email-address" 
+                value={contactoCorreo}
+                onChangeText={setContactoCorreo}
+                onFocus={() => handleFocus('contactoCorreo')}
+              />
+              {errors.contactoCorreo && <Text style={styles.errorText}>{errors.contactoCorreo}</Text>}
             </View>
 
-            <Text style={styles.label}>Tipos de alerta:</Text>
-            <View style={styles.checkboxContainer}>
-              {/* Email Alert */}
-              <View style={styles.alertOption}>
-                <TouchableOpacity onPress={() => toggleCheckbox('email')} style={styles.checkbox}>
-                  {checkboxState.email && <Ionicons name="checkmark" size={16} color={Colors.primary} />}
-                </TouchableOpacity>
-                <Ionicons name="mail-outline" size={20} style={styles.icon} />
-                <Text style={styles.alertText}>Email</Text>
-              </View>
-              
-              {/* SMS Alert */}
-              <View style={styles.alertOption}>
-                <TouchableOpacity onPress={() => toggleCheckbox('sms')} style={styles.checkbox}>
-                  {checkboxState.sms && <Ionicons name="checkmark" size={16} color={Colors.primary} />}
-                </TouchableOpacity>
-                <Ionicons name="chatbox-ellipses-outline" size={20} style={styles.icon} />
-                <Text style={styles.alertText}>SMS</Text>
-              </View>
-            </View>
-
-            <TouchableOpacity style={styles.saveButton} onPress={onClose}>
+            <Text style={styles.label}>En caso de eventos críticos, las alertas se enviarán mediante SMS.</Text>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>Guardar</Text>
             </TouchableOpacity>
           </ScrollView>
@@ -117,35 +179,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    // borderRadius: 10,
+  },
+  inputError: {
+    borderColor: 'red',
   },
   label: {
-    fontSize: 16,
+    fontSize: 10.9,
     marginBottom: 10,
   },
-  checkboxContainer: {
-    marginBottom: 20,
-  },
-  alertOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderWidth: 1,
-    borderColor: Colors.primary,
-    borderRadius: 5,
-    marginRight: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  icon: {
-    marginRight: 5,
-  },
-  alertText: {
-    fontSize: 16,
+  errorText: {
+    color: 'red',
+    fontSize: 12,
   },
   saveButton: {
     backgroundColor: Colors.primary,

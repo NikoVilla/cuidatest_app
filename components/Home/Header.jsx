@@ -1,14 +1,44 @@
 import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState} from 'react';
 import Colors from '../../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import appFirebase from './../../app/auth/credentials';
 
 const { height } = Dimensions.get('window');
 const HEADER_HEIGHT = height * 0.18;
 
+const db = getFirestore(appFirebase);
+const auth = getAuth(appFirebase);
+
 export default function Header() {
   const navigation = useNavigation();
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDocRef = doc(db, 'Usuarios', user.email);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            setUserData(userDocSnap.data());
+          } else {
+            console.log('No existe información del usuario.');
+          }
+        } catch (error) {
+          console.error('Error al obtener datos del usuario:', error);
+        }
+      } else {
+        console.log('No hay ningún usuario logueado.');
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <View style={[styles.container, { height: HEADER_HEIGHT }]}>
@@ -23,7 +53,9 @@ export default function Header() {
 
       <View style={styles.centerSection}>
         <Text style={styles.welcomeText}>Bienvenido de nuevo</Text>
-        <Text style={styles.nameText}>Nicolás Villanueva</Text>
+        <Text style={styles.nameText}>
+          {userData ? `${userData.nombres} ${userData.apellidos}` : 'Cargando...'}
+        </Text>
       </View>
 
       <TouchableOpacity onPress={() => navigation.navigate('login/index')} style={styles.circle} > 

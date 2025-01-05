@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, View, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
 import Colors from '../../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
 import { formatRUT, formatFecha, formatCelular } from '../../constants/formatters';
 import { validateRUT, validatePhone } from '../../constants/validators';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import appFirebase from './../auth/credentials';
+
+const db = getFirestore(appFirebase);
+const auth = getAuth(appFirebase);
 
 export default function SignUpScreen() {
   const navigation = useNavigation();
@@ -13,11 +19,13 @@ export default function SignUpScreen() {
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
-  const [genero, setGenero] = useState('');
   const [celular, setCelular] = useState('');
   const [direccion, setDireccion] = useState('');
   const [correo, setCorreo] = useState('');
   const [contraseña, setContraseña] = useState('');
+  const [condicion, setCondicion] = useState('');
+  const [alergias, setAlergias] = useState('');
+  const [medicamentos, setMedicamentos] = useState('');
 
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
@@ -30,22 +38,46 @@ export default function SignUpScreen() {
     if (!nombres) newErrors.nombres = true;
     if (!apellidos) newErrors.apellidos = true;
     if (!fechaNacimiento) newErrors.fechaNacimiento = true;
-    if (!genero) newErrors.genero = true;
     if (!celular || !validatePhone(celular)) {newErrors.celular = "N° de celular inválido";}
     if (!direccion) newErrors.direccion = true;
     if (!correo || !/\S+@\S+\.\S+/.test(correo)) newErrors.correo = true;
     if (!contraseña || contraseña.length < 6) newErrors.contraseña = true;
+    if (!condicion) newErrors.condicion = true;
+    if (!alergias) newErrors.alergias = true;
+    if (!medicamentos) newErrors.medicamentos = true;
 
     setErrors(newErrors);
     
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     setIsSubmitted(true);
     if (validateForm()) {
-      navigation.navigate('login/index');
-      setFormError(''); 
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, correo, contraseña);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, 'Usuarios', correo), {
+          rut,
+          nombres,
+          apellidos,
+          fechaNacimiento,
+          celular,
+          direccion,
+          correo,
+          condicion,
+          alergias,
+          medicamentos,
+        });
+  
+        setFormError('');
+        Alert.alert('Registro exitoso', 'El usuario se ha registrado correctamente.');
+        navigation.navigate('login/index');
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Error', 'Error al registrar usuario. Intenta nuevamente.');
+      }
     }
   };
 
@@ -109,21 +141,6 @@ export default function SignUpScreen() {
             </View>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            {/* <View style={{ flex: 1, marginRight: 4 }}>
-              <Picker
-                selectedValue={genero}
-                style={[styles.input, isSubmitted && genero === "" && { color: 'red' }]}
-                onValueChange={(itemValue) => {
-                  if (itemValue !== "") {
-                    setGenero(itemValue);
-                  }
-                }}
-              >
-                <Picker.Item label="Género" value=""/>
-                <Picker.Item label="Hombre" value="Hombre" />
-                <Picker.Item label="Mujer" value="Mujer" />
-              </Picker>
-            </View> */}
             <View style={{ flex: 1, marginRight: 4 }}>
               <TextInput
                 style={[styles.input, errors.celular && styles.errorInput]}
@@ -168,10 +185,44 @@ export default function SignUpScreen() {
               <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="black" />
             </TouchableOpacity>
           </View>
+          <Text style={styles.titleText1}>Datos médicos</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.medicalInput, errors.condicion && styles.errorInput]}
+              placeholder={errors.condicion ? "Campo obligatorio" : "Condiciones preexistentes"}
+              multiline
+              value={condicion}
+              onChangeText={setCondicion}
+              onSubmitEditing={() => setCondicion(condicion + '\n')} 
+              onFocus={() => handleFocus('condicion')}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.medicalInput, errors.condicion && styles.errorInput]}
+              placeholder={errors.condicion ? "Campo obligatorio" :"Alergias"}
+              multiline
+              value={alergias}
+              onChangeText={setAlergias} 
+              onSubmitEditing={() => setAlergias(alergias + '\n')}
+              onFocus={() => handleFocus('alergias')}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.medicalInput, errors.condicion && styles.errorInput]}
+              placeholder={errors.condicion ? "Campo obligatorio" :"Medicamentos actuales"}
+              multiline 
+              value={medicamentos}
+              onChangeText={setMedicamentos} 
+              onSubmitEditing={() => setMedicamentos(medicamentos + '\n')}
+              onFocus={() => handleFocus('medicamentos')}
+            />
+          </View>    
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.buttonText}>Registrarse</Text>
           </TouchableOpacity>
-          {formError ? <Text style={styles.formErrorText}>{formError}</Text> : null}
+          {/* {formError ? <Text style={styles.formErrorText}>{formError}</Text> : null} */}
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>¿No tienes cuenta? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('login/index')}>
@@ -195,6 +246,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
   },
+  medicalInput: {
+    height: 70,
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+    textAlignVertical: 'top',
+  },
   bottomSection: {
     flex: 2,
     backgroundColor: Colors.secondary,
@@ -203,6 +263,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'space-evenly',
     padding: 20,
+  },
+  titleText1: {
+    fontFamily: 'inter-semibold',
+    fontSize: 14,
+    color: Colors.negro,
+    textAlign: 'left',
+    marginBottom: 10,
   },
   image: {
     width: 100,
@@ -217,6 +284,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flexShrink: 1,
     flexGrow: 1,
+  },
+  inputContainer: {
+    flex: 1,
+    marginRight: 4,
   },
   titleText: {
     fontFamily: 'iceberg',

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Colors from "../../constants/Colors";
 import { BarChart, LineChart } from "react-native-gifted-charts";
+import MeasurementChart from './MeasurementChart';
 
 // Datos simulados para las tres mediciones
 const getData = (filter, measurementType) => {
@@ -11,9 +12,9 @@ const getData = (filter, measurementType) => {
 
   if (measurementType === 'frecuencia cardiaca') {
     if (filter === 'Hora') {
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 7; i++) {
         data.push({
-          value: 60 + Math.random() * 40, // Frecuencia cardiaca aleatoria entre 60 y 100
+          value: 60 + Math.random() * 40,
           label: `${i * 10} min`,
         });
       }
@@ -25,18 +26,19 @@ const getData = (filter, measurementType) => {
         });
       }
     } else if (filter === 'Semana') {
+      const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
       for (let i = 0; i < 7; i++) {
         data.push({
           value: 60 + Math.random() * 40,
-          label: `Día ${i + 1}`,
+          label: daysOfWeek[i],
         });
       }
     }
   } else if (measurementType === 'temperatura') {
     if (filter === 'Hora') {
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 7; i++) {
         data.push({
-          value: 20 + Math.random() * 5, // Temperatura aleatoria entre 20 y 25 °C
+          value: 20 + Math.random() * 5,
           label: `${i * 10} min`,
         });
       }
@@ -57,9 +59,9 @@ const getData = (filter, measurementType) => {
     }
   } else if (measurementType === 'velocidad angular') {
     if (filter === 'Hora') {
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 7; i++) {
         data.push({
-          value: Math.random() * 100, // Velocidad angular aleatoria entre 0 y 100 °/s
+          value: Math.random() * 100,
           label: `${i * 10} min`,
         });
       }
@@ -133,32 +135,31 @@ export default function Dashboard() {
             onValueChange={(value) => setSelectedOption(value)}
             items={pickerOptions}
             value={selectedOption}
-            useNativeAndroidPickerStyle={false} // Desactiva estilo nativo
+            useNativeAndroidPickerStyle={false}
             style={{
               inputAndroid: {
-                backgroundColor: Colors.primary, // Color del fondo
+                backgroundColor: Colors.primary,
                 paddingVertical: 1,
                 paddingHorizontal: 8,
-                borderWidth: 1, // Borde visible
+                borderWidth: 1,
                 borderColor: Colors.primary,
-                borderRadius: 5, // Bordes redondeados
+                borderRadius: 5,
                 color: 'white',
                 fontSize: 12,
                 fontFamily: 'inter-medium',
               },
               placeholder: {
-                color: 'gray', // Color del texto del placeholder
+                color: 'gray',
               },
             }}
             placeholder={{
               label: 'Seleccionar',
-              value: null, // Hace que el placeholder no sea seleccionable
+              value: null,
             }}
           />
         </View>  
       </View>
 
-      {/* Gráfico */}
       <View style={styles.chartContainer}>
         {selectedGraph === 'frecuencia cardiaca' && (
           <LineChart
@@ -191,7 +192,7 @@ export default function Dashboard() {
                   <View
                     style={{
                       height: 90,
-                      width: 100,
+                      width: 50,
                       justifyContent: 'center',
                       marginTop: -30,
                       marginLeft: -40,  
@@ -201,7 +202,7 @@ export default function Dashboard() {
                     </Text>
                     <View style={{paddingHorizontal:14,paddingVertical:6, borderRadius:16, backgroundColor:'white'}}>
                       <Text style={{fontWeight: 'bold',textAlign:'center'}}>
-                        {items[0].value}
+                      {Math.trunc(items[0].value)}
                       </Text>
                     </View>
                   </View>
@@ -337,6 +338,10 @@ export default function Dashboard() {
           />
         )}
       </View>
+      <View>
+        
+      </View>
+
     </View>
   );
 }
@@ -364,4 +369,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontFamily: 'inter-bold' },
   title2: { fontSize: 12, fontFamily: 'inter-regular', marginRight: 6 },
   chartContainer: { alignItems: 'center', marginTop: 20 },
+
 });
