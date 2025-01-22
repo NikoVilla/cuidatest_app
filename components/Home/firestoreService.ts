@@ -24,7 +24,6 @@ const FirestoreService = {
     timestamp?: Date;
   }): Promise<void> {
     try {
-      // Obtener el usuario autenticado
       const user = auth.currentUser;
 
       if (!user || !user.email) {

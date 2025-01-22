@@ -13,6 +13,17 @@ export default function CustomModal({ visible, onClose, userData }) {
   const [contactoCelular, setContactoCelular] = useState('');
   const [contactoDireccion, setContactoDireccion] = useState('');
   const [contactoCorreo, setContactoCorreo] = useState('');
+  const [alertPreferences, setAlertPreferences] = useState({
+    SMS: false,
+    Email: false,
+  });
+
+  const handleCheckboxToggle = (key) => {
+    setAlertPreferences((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
 
   const handleFocus = (field) => {
     if (errors[field]) {
@@ -37,9 +48,10 @@ export default function CustomModal({ visible, onClose, userData }) {
     try {
       const newContact = {
         nombreCompleto,
-        contactoCelular: contactoCelular,
-        contactoDireccion: contactoDireccion,
-        contactoCorreo: contactoCorreo,
+        contactoCelular,
+        contactoDireccion,
+        contactoCorreo,
+        alertPreferences,
       };
   
       if (!userData || !userData.correo) {
@@ -128,7 +140,21 @@ export default function CustomModal({ visible, onClose, userData }) {
               {errors.contactoCorreo && <Text style={styles.errorText}>{errors.contactoCorreo}</Text>}
             </View>
 
-            <Text style={styles.label}>En caso de eventos críticos, las alertas se enviarán mediante SMS.</Text>
+            <Text style={styles.label}>Opciones de alerta:</Text>
+            {['SMS', 'Email'].map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={styles.checkboxContainer}
+                onPress={() => handleCheckboxToggle(option)}
+              >
+                <Ionicons
+                  name={alertPreferences[option] ? 'checkbox' : 'square-outline'}
+                  size={20}
+                  color={Colors.primary}
+                />
+                <Text style={styles.checkboxLabel}>{option}</Text>
+              </TouchableOpacity>
+            ))}
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>Guardar</Text>
             </TouchableOpacity>
@@ -196,10 +222,21 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     alignItems: 'center',
+    marginTop: 10,
   },
   saveButtonText: {
     color: Colors.secondary,
     fontSize: 16,
     fontFamily: 'inter-semibold',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  checkboxLabel: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: 'black',
   },
 });

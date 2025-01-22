@@ -14,17 +14,18 @@ type CardProps = {
   contactoCelular: string;
   contactoDireccion: string;
   contactoCorreo: string;
+  alertPreferences: string;
   onDelete: (id: string) => void;
   onEdit: (contact: any) => void;
 };
 
-function Card({ id, nombreCompleto, contactoCelular, contactoDireccion, contactoCorreo, onDelete, onEdit }: CardProps) {
+function Card({ id, nombreCompleto, contactoCelular, contactoDireccion, contactoCorreo, alertPreferences, onDelete, onEdit }: CardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <Text style={styles.name}>{nombreCompleto}</Text>
         <View style={styles.iconContainer}>
-          <TouchableOpacity style={[styles.button, styles.editButton]} onPress={() => onEdit({ id, nombreCompleto, contactoCelular, contactoDireccion, contactoCorreo })}>
+          <TouchableOpacity style={[styles.button, styles.editButton]} onPress={() => onEdit({ id, nombreCompleto, contactoCelular, contactoDireccion, contactoCorreo, alertPreferences })}>
             <Ionicons name="pencil" size={20} color="white" />
           </TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={() => onDelete(contactoCorreo)}>
@@ -35,16 +36,25 @@ function Card({ id, nombreCompleto, contactoCelular, contactoDireccion, contacto
       <Text style={styles.infoText}>{contactoCelular}</Text>
       <Text style={styles.infoText}>{contactoDireccion}</Text>
       <Text style={styles.infoText}>{contactoCorreo}</Text>
-    </View>
+      <Text style={styles.infoText}>Tipo de Alerta: {Object.keys(alertPreferences).filter(key => alertPreferences[key]).join(', ')}</Text>
+      </View>
   );
 }
 
 export default function CardList() {
   const [contacts, setContacts] = useState([]);
   const [editingContact, setEditingContact] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [updatedData, setUpdatedData] = useState({ nombreCompleto: '', contactoCelular: '', contactoDireccion: '', contactoCorreo: '' });
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); 
+  const [updatedData, setUpdatedData] = useState({
+    nombreCompleto: '',
+    contactoCelular: '',
+    contactoDireccion: '',
+    contactoCorreo: '',
+    alertPreferences: {
+      SMS: false,
+      Email: false,
+    },
+  });  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -59,19 +69,21 @@ export default function CardList() {
           const userId = docSnapshot.id;
           const userData = docSnapshot.data();
 
-          console.log('Datos del usuario:', { userId, userData });
+          // console.log('Datos del usuario:', { userId, userData });
   
           try {
             const contactoSnapshot = await getDocs(collection(db, `Usuarios/${userId}/Contacto`));
   
             contactoSnapshot.forEach((contactDoc) => {
               const contactoData = contactDoc.data();
+
               usersData.push({
                 id: contactDoc.id,
                 nombreCompleto: contactoData.nombreCompleto || '',
                 contactoCelular: contactoData.contactoCelular || '',
                 contactoDireccion: contactoData.contactoDireccion || '',
                 contactoCorreo: contactoData.contactoCorreo || '',
+                alertPreferences: contactoData.alertPreferences || '',
                 ...userData,
               });
             });
@@ -140,50 +152,72 @@ export default function CardList() {
   
   const handleEdit = (contact: any) => {
     setEditingContact(contact.id);
-    setUpdatedData(contact);
+    setUpdatedData({
+      nombreCompleto: contact.nombreCompleto,
+      contactoCelular: contact.contactoCelular,
+      contactoDireccion: contact.contactoDireccion,
+      contactoCorreo: contact.contactoCorreo,
+      alertPreferences: {
+        SMS: contact.alertPreferences && contact.alertPreferences.SMS,
+        Email: contact.alertPreferences && contact.alertPreferences.Email,
+      },
+    });
     setModalVisible(true);
   };
 
-const handleSaveEdit = async () => {
-  try {
-    if (editingContact) {
-      // Encuentra el usuario y el contacto correspondiente
-      const userQuerySnapshot = await getDocs(collection(db, 'Usuarios'));
-      
-      let contactFound = false;
+  const handleCheckboxToggle = (option: string) => {
+    setUpdatedData((prevData) => ({
+      ...prevData,
+      alertPreferences: {
+        ...prevData.alertPreferences,
+        [option]: !prevData.alertPreferences[option],
+      },
+    }));
+  };
+  
 
-      for (const userDoc of userQuerySnapshot.docs) {
-        const userId = userDoc.id;
-        const contactoRef = collection(db, `Usuarios/${userId}/Contacto`);
-        const contactoSnapshot = await getDocs(contactoRef);
+  const handleSaveEdit = async () => {
+    try {
+      if (editingContact) {
+        console.log('ID del contacto a editar:', editingContact);
+        // Encuentra el usuario y el contacto correspondiente
+        const userQuerySnapshot = await getDocs(collection(db, 'Usuarios'));
+        
+        let contactFound = false;
 
-        for (const contactoDoc of contactoSnapshot.docs) {
-          if (contactoDoc.id === editingContact) {
-            await updateDoc(doc(contactoRef, contactoDoc.id), {
-              ...updatedData,
-            });
-            console.log(`Contacto con ID ${editingContact} actualizado`);
-            contactFound = true;
+        for (const userDoc of userQuerySnapshot.docs) {
+          const userId = userDoc.id;
+          const contactoRef = collection(db, `Usuarios/${userId}/Contacto`);
+          const contactoSnapshot = await getDocs(contactoRef);
+
+          for (const contactoDoc of contactoSnapshot.docs) {
+            if (contactoDoc.id === editingContact) {
+              await updateDoc(doc(contactoRef, contactoDoc.id), {
+                ...updatedData,
+              });
+              console.log(`Contacto con ID ${editingContact} actualizado`);
+              contactFound = true;
+              break;
+            }
+          }
+
+          if (contactFound) {
             break;
           }
         }
 
-        if (contactFound) {
-          break;
+        if (!contactFound) {
+          console.error(`No se encontró contacto con ID ${editingContact}`);
         }
-      }
 
-      if (!contactFound) {
-        console.error(`No se encontró contacto con ID ${editingContact}`);
+        setModalVisible(false);
+        setEditingContact(null);
+        
       }
-
-      setModalVisible(false);
-      setEditingContact(null);
+    } catch (error) {
+      console.error('Error al actualizar el contacto:', error);
     }
-  } catch (error) {
-    console.error('Error al actualizar el contacto:', error);
-  }
-};
+  };
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -198,13 +232,15 @@ const handleSaveEdit = async () => {
         const contactoSnapshot = await getDocs(collection(db, `Usuarios/${userId}/Contacto`));
 
         contactoSnapshot.forEach((contactDoc) => {
-          const contactoData = contactDoc.data();
+          const contactoData = contactDoc.data();        
+
           usersData.push({
-            id: userId + '-' + contactDoc.id,
+            id: contactDoc.id,
             nombreCompleto: contactoData.nombreCompleto || '',
             contactoCelular: contactoData.contactoCelular || '',
             contactoDireccion: contactoData.contactoDireccion || '',
             contactoCorreo: contactoData.contactoCorreo || '',
+            alertPreferences: contactoData.alertPreferences || '',
             ...userData,
           });
         });
@@ -231,6 +267,7 @@ const handleSaveEdit = async () => {
                 contactoCelular={item.contactoCelular}
                 contactoDireccion={item.contactoDireccion}
                 contactoCorreo={item.contactoCorreo}
+                alertPreferences={item.alertPreferences}
                 onDelete={handleDeleteConfirmation}
                 onEdit={handleEdit}
               />
@@ -275,7 +312,21 @@ const handleSaveEdit = async () => {
               value={updatedData.contactoCorreo}
               onChangeText={(text) => setUpdatedData({ ...updatedData, contactoCorreo: text })}
             />
-            <Text style={styles.label}>En caso de eventos críticos, las alertas se enviarán mediante SMS.</Text>
+            <Text style={styles.label}>Opciones de alerta:</Text>
+            {['SMS', 'Email'].map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={styles.checkboxContainer}
+                onPress={() => handleCheckboxToggle(option)}
+              >
+                <Ionicons
+                  name={updatedData.alertPreferences[option] ? 'checkbox' : 'square-outline'}
+                  size={20}
+                  color={Colors.primary}
+                />
+                <Text style={styles.checkboxLabel}>{option}</Text>
+              </TouchableOpacity>
+            ))}
             <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdit}>
               <Text style={styles.saveButtonText}>Guardar</Text>
             </TouchableOpacity>
@@ -422,5 +473,15 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  checkboxLabel: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: 'black',
   },
 });

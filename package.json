@@ -29,8 +29,10 @@
     "@react-navigation/stack": "^6.4.1",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "expo": "~51.0.28",
     "expo-app-loading": "^2.1.1",
+    "expo-auth-session": "~5.5.2",
     "expo-constants": "~16.0.2",
     "expo-device": "^6.0.2",
     "expo-font": "~12.0.10",
@@ -44,9 +46,11 @@
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
+    "express": "^4.21.2",
     "firebase": "^10.14.1",
     "google-auth-library": "^9.15.0",
     "googleapis": "^144.0.0",
+    "nodemailer": "^6.9.16",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
@@ -64,7 +68,7 @@
     "react-native-sendgrid": "^1.0.2",
     "react-native-svg": "15.2.0",
     "react-native-web": "~0.19.10",
-    "expo-auth-session": "~5.5.2"
+    "expo-sms": "~12.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
